@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using alpha.io.Services;
+using alpha.io.SQLite;
+using alpha.io.SQLite.Entities.Guild;
 
 namespace alpha.io
 {
     public class AlphaBot
     {
         private DiscordSocketClient _client;
-        private CommandHandler _handler;
+        private ServiceHandler _handler;
+        private GuildDb _guildDb;
+        private UserDb _userDb;
 
         public static void Main(string[] args) => new AlphaBot().Start().GetAwaiter().GetResult();
         
@@ -30,14 +36,20 @@ namespace alpha.io
 
             var map = new DependencyMap();
             map.Add(_client);
-            _handler = new CommandHandler();
+            _handler = new ServiceHandler();
             await _handler.Install(map);
 
-            _client.UserVoiceStateUpdated += new VoiceWatcher().UserStateChanged;
+            _client.UserVoiceStateUpdated += new VoiceService().UserStateChanged;
             _client.Log += Logger;
             _client.Ready += async delegate
             {
+
+                _guildDb = new GuildDb();
+                _userDb = new UserDb();
                 await ClientOnReady();
+
+                await _guildDb.AddGuildsAsync(_client.Guilds);
+                await _userDb.AddOrUpdateUsersAsync(_client.Guilds);
             };
             await Task.Delay(-1);
         }
@@ -45,11 +57,13 @@ namespace alpha.io
         public async Task ClientOnReady()
         {
             //TODO: Format into table with server information (users, date joined, etc)
-            string servers = string.Join(", ", (from guild in _client.Guilds select guild.Name).ToArray());
+            //string servers = string.Join(", ", (from guild in _client.Guilds select guild.Name).ToArray());
+            
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"{DateTime.Now,-19} [Info   ] Gateway: {servers}");
+            //Console.WriteLine($"{DateTime.Now,-19} [Info   ] Gateway: {servers}");
             await _client.SetGameAsync("Alpha Crucis Exiles");
         }
+        
 
         public Task Logger(LogMessage message)
         {

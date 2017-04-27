@@ -3,12 +3,12 @@ using System.Data.SQLite;
 
 namespace alpha.io
 {
-    public static class AlphaSql
+    public static class AlphaDb
     {
         private static readonly string _dbPath = Environment.CurrentDirectory + @"\serverDB.s3db";
         private static SQLiteConnection Connection { get; set; }
 
-        static AlphaSql()
+        static AlphaDb()
         {
             //var constring = $@"Data Source={_dbPath};Version=3;";
             var constring = new SQLiteConnectionStringBuilder
@@ -41,6 +41,7 @@ namespace alpha.io
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = @"CREATE TABLE IF NOT EXISTS `voice_activity` (`guild_id` INTEGER, `user_id` INTEGER, `timestamp` TIMESTAMP, `action` TEXT, `channel` INTEGER)";
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }
@@ -51,5 +52,7 @@ namespace alpha.io
             }
             return true;
         }
+
+
     }
 }
