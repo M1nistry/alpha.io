@@ -59,6 +59,11 @@ namespace alpha.io.SQLite
             Channels.UpdateRange(liteChannels);
             await SaveChangesAsync();
         }
+
+        public async Task GetGuildId(ulong channelId)
+        {
+            
+        }
     }
 
    

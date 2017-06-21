@@ -47,7 +47,7 @@ namespace alpha.io.Services
                 return;
             }
 
-            var newActivity = new LiteVoiceActivity(newState.VoiceChannel?.Guild.Id ?? initialState.VoiceChannel.Guild.Id, new ulong(), user.Id, LiteVoiceActivity.ActivityTypes.Empty);
+            var newActivity = new LiteVoiceActivity(newState.VoiceChannel?.Guild.Id ?? initialState.VoiceChannel.Guild.Id, user.Id, new ulong(), LiteVoiceActivity.ActivityTypes.Empty);
 
             if (!initialState.IsSelfMuted && newState.IsSelfMuted)
             {

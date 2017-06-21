@@ -12,7 +12,9 @@ namespace alpha.io.Modules.Voice
 {
     class MonitorVoice : ModuleBase<SocketCommandContext>
     {
-        private VoiceDb _db;
+        private VoiceDb voiceDb;
+        private UserDb userDb;
+        private GuildDb guildDb;
 
         [Command("monitor", RunMode = RunMode.Async)]
         [RequireUserPermission(GuildPermission.ManageGuild)]
@@ -32,6 +34,13 @@ namespace alpha.io.Modules.Voice
 
         public async Task CreateExport()
         {
+            voiceDb = new VoiceDb();
+            userDb = new UserDb();
+            
+            var voiceTable = voiceDb.VoiceActivity;
+            var userTable = userDb.Users;
+
+
             //await _db.VoiceActivity.T
         }
     }

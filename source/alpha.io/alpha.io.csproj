@@ -210,11 +210,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\VoiceService.cs" />
     <Compile Include="SQLite\Databases\GuildDb.cs" />
+    <Compile Include="SQLite\Databases\MessageDb.cs" />
     <Compile Include="SQLite\Databases\UserDb.cs" />
     <Compile Include="SQLite\Databases\VoiceDb.cs" />
     <Compile Include="SQLite\Entities\Guild\LiteGuild.cs" />
     <Compile Include="SQLite\Entities\Guild\LiteGuildChannel.cs" />
     <Compile Include="SQLite\Entities\LiteEntity.cs" />
+    <Compile Include="SQLite\Entities\Message\LiteMessage.cs" />
     <Compile Include="SQLite\Entities\User\LiteUser.cs" />
     <Compile Include="SQLite\Entities\Voice\LiteVoiceActivity.cs" />
     <Compile Include="SQLite\SQLiteConfig.cs" />

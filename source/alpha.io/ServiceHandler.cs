@@ -65,6 +65,8 @@ namespace alpha.io
                 db.Database.EnsureCreated();
             using (var db = new SQLite.UserDb())
                 db.Database.EnsureCreated();
+            using (var db = new SQLite.MessageDb())
+                db.Database.EnsureCreated();
 
         }
     }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using alpha.io.Services;
 using alpha.io.SQLite;
 using alpha.io.SQLite.Entities.Guild;
+using alpha.io.SQLite.Entities.Message;
 
 namespace alpha.io
 {
@@ -18,6 +19,7 @@ namespace alpha.io
         private ServiceHandler _handler;
         private GuildDb _guildDb;
         private UserDb _userDb;
+        private MessageDb _messageDb;
 
         public static void Main(string[] args) => new AlphaBot().Start().GetAwaiter().GetResult();
         
@@ -41,17 +43,32 @@ namespace alpha.io
 
             _client.UserVoiceStateUpdated += new VoiceService().UserStateChanged;
             _client.Log += Logger;
+            _client.MessageReceived += _client_MessageReceived;
             _client.Ready += async delegate
             {
 
                 _guildDb = new GuildDb();
                 _userDb = new UserDb();
+                _messageDb = new MessageDb();
                 await ClientOnReady();
 
                 await _guildDb.AddGuildsAsync(_client.Guilds);
                 await _userDb.AddOrUpdateUsersAsync(_client.Guilds);
             };
             await Task.Delay(-1);
+        }
+
+        private async Task _client_MessageReceived(SocketMessage arg)
+        {
+            var guildId = new ulong();
+            var guild = (arg.Channel as SocketGuildChannel)?.Guild;
+            var newMessage = new LiteMessage
+            (
+                arg.Channel.Id,
+                arg.Author.Id,
+                guild?.Id ?? guildId
+            );
+            await _messageDb.AddMessageAsync(newMessage);
         }
 
         public async Task ClientOnReady()
