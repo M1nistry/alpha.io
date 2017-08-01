@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using alpha.io.MSSQL;
 using alpha.io.Services;
 using alpha.io.SQLite;
 using alpha.io.SQLite.Entities.Guild;
@@ -20,6 +22,8 @@ namespace alpha.io
         private GuildDb _guildDb;
         private UserDb _userDb;
         private MessageDb _messageDb;
+
+        private ace_db _aceDb;
 
         public static void Main(string[] args) => new AlphaBot().Start().GetAwaiter().GetResult();
         
@@ -46,14 +50,61 @@ namespace alpha.io
             _client.MessageReceived += _client_MessageReceived;
             _client.Ready += async delegate
             {
-
+                _aceDb = new ace_db();
+                _aceDb.Configuration.AutoDetectChangesEnabled = false;
                 _guildDb = new GuildDb();
                 _userDb = new UserDb();
                 _messageDb = new MessageDb();
                 await ClientOnReady();
 
-                await _guildDb.AddGuildsAsync(_client.Guilds);
-                await _userDb.AddOrUpdateUsersAsync(_client.Guilds);
+                
+                var newGuilds = (from guild in _client.Guilds
+                              select new Guild { 
+                                GuildId = (long)guild.Id, OwnerId = (long)guild.OwnerId, Name = guild.Name
+                              }).ToList();
+
+                var channels = (from guild in _client.Guilds
+                              from channel in guild.Channels
+                              select new Channel
+                              {
+                                  ChannelId = channel.Id,
+                                  GuildId = guild.Id,
+                                  Name = channel.Name
+                              }).ToList();
+
+                foreach (var channel in channels)
+                    Console.WriteLine(channel.Id + " - " + channel.ChannelId);
+                var users = (from guild in _client.Guilds
+                             from user in guild.Users
+                             select new User
+                             {
+                                DiscordId = user.Id, Name = user.Username,
+                             }).ToList();
+
+                try
+                {
+                    foreach (SocketGuild guild in _client.Guilds.Where(us => !_aceDb.Guilds.Any(u => u.GuildId == (long)us.Id)))
+                    {
+                        _aceDb.Guilds.Add(new Guild
+                        {
+                            GuildId = (long)guild.Id,
+                            Name = guild.Name,
+                            OwnerId = (long)guild.OwnerId
+                        });
+                    }
+
+                    //_aceDb.Guilds.AddRange(newGuilds);
+                   // _aceDb.Channels.AddRange(channels);
+                   // _aceDb.Users.AddRange(users);
+                    await _aceDb.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
+                //await _guildDb.AddGuildsAsync(_client.Guilds);
+                //await _userDb.AddOrUpdateUsersAsync(_client.Guilds);
             };
             await Task.Delay(-1);
         }
@@ -81,7 +132,6 @@ namespace alpha.io
             await _client.SetGameAsync("Alpha Crucis Exiles");
         }
         
-
         public Task Logger(LogMessage message)
         {
             var cc = Console.ForegroundColor;
