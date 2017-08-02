@@ -11,11 +11,11 @@ namespace alpha.io
     {
         private CommandService _commands;
         private DiscordSocketClient _client;
-        private IDependencyMap map;
 
-        public async Task Install(IDependencyMap _map)
+
+        public async Task Install(DiscordSocketClient c)
         {
-            _client = _map.Get<DiscordSocketClient>();
+            _client = c;
             _commands = new CommandService(new CommandServiceConfig
             {
                 CaseSensitiveCommands = false,
@@ -26,8 +26,6 @@ namespace alpha.io
                 DefaultRunMode = RunMode.Async
 #endif
             });
-            //_map.Add(_commands);
-            map = _map;
             
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
             await InitializeSQLiteAsync(_commands);
@@ -48,7 +46,7 @@ namespace alpha.io
             // Create a Command Context
             var context = new CommandContext(_client, message);
             // Execute the Command, store the result
-            var result = await _commands.ExecuteAsync(context, argPos, map);
+            var result = await _commands.ExecuteAsync(context, argPos);
 
             // If the command failed, notify the user
             if (!result.IsSuccess)

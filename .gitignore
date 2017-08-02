@@ -260,4 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 /alpha.io/source/Key.txt
+/alpha.io/source/App.config
 /source/alpha.io/Key.txt
+/source/alpha.io/App.config

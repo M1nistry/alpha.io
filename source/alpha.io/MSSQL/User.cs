@@ -17,6 +17,7 @@ namespace alpha.io.MSSQL
         [Column("username")]
         public string Name { get; set; }
 
-        [Column("poe_account")] public string PoEAccount { get; set; }
+        [Column("poe_account")]
+        public string PoEAccount { get; set; }
     }
 }

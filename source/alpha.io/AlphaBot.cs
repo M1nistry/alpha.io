@@ -40,10 +40,10 @@ namespace alpha.io
             await _client.LoginAsync(TokenType.Bot, keyString);
             await _client.StartAsync();
 
-            var map = new DependencyMap();
-            map.Add(_client);
+            //var map = new DependencyMap();
+            //map.Add(_client);
             _handler = new ServiceHandler();
-            await _handler.Install(map);
+            await _handler.Install(_client);
 
             _client.UserVoiceStateUpdated += new VoiceService().UserStateChanged;
             _client.Log += Logger;
